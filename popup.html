@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>贴吧签到</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="top-app-bar">
+      <div class="brand">
+        <img class="brand-mark" src="icons/mark.svg" alt="" aria-hidden="true">
+        <div class="brand-copy">
+          <h1>贴吧签到</h1>
+          <p id="versionText">版本 3.1.1</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="icon-button" id="refreshButton" type="button" aria-label="刷新状态" title="刷新状态">
+          <svg class="material-symbol" viewBox="0 -960 960 960" aria-hidden="true"><path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-70q0-17 11.5-28.5T760-800q17 0 28.5 11.5T800-760v200q0 17-11.5 28.5T760-520H560q-17 0-28.5-11.5T520-560q0-17 11.5-28.5T560-600h128q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q68 0 124.5-34.5T692-367q8-14 22.5-19.5t29.5-.5q16 5 23 21t-1 30q-41 80-117 128t-169 48Z"/></svg>
+        </button>
+        <button class="icon-button" id="settingsButton" type="button" aria-label="打开设置" title="设置">
+          <svg class="material-symbol" viewBox="0 -960 960 960" aria-hidden="true"><path d="M433-80q-27 0-46.5-18T363-142l-9-66q-13-5-24.5-12T307-235l-62 26q-25 11-50 2t-39-32l-47-82q-14-23-8-49t27-43l53-40q-1-7-1-13.5v-27q0-6.5 1-13.5l-53-40q-21-17-27-43t8-49l47-82q14-23 39-32t50 2l62 26q11-8 23-15t24-12l9-66q4-26 23.5-44t46.5-18h94q27 0 46.5 18t23.5 44l9 66q13 5 24.5 12t22.5 15l62-26q25-11 50-2t39 32l47 82q14 23 8 49t-27 43l-53 40q1 7 1 13.5v27q0 6.5-2 13.5l53 40q21 17 27 43t-8 49l-48 82q-14 23-39 32t-50-2l-60-26q-11 8-23 15t-24 12l-9 66q-4 26-23.5 44T527-80h-94Zm7-80h79l14-106q31-8 57.5-23.5T639-327l99 41 39-68-86-65q5-14 7-29.5t2-31.5q0-16-2-31.5t-7-29.5l86-65-39-68-99 42q-22-23-48.5-38.5T533-694l-13-106h-79l-14 106q-31 8-57.5 23.5T321-633l-99-41-39 68 86 64q-5 15-7 30t-2 32q0 16 2 31t7 30l-86 65 39 68 99-42q22 23 48.5 38.5T427-266l13 106Zm42-180q58 0 99-41t41-99q0-58-41-99t-99-41q-59 0-99.5 41T342-480q0 58 40.5 99t99.5 41Zm-2-140Z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="view-stack">
+      <section class="view main-view" id="mainView" aria-labelledby="statusTitle">
+        <section class="status-surface" id="statusPanel" data-tone="neutral">
+          <div class="status-heading">
+            <span class="status-glyph" id="statusGlyph" data-icon="play_arrow" aria-hidden="true">
+              <svg class="material-symbol" viewBox="0 -960 960 960"><path id="statusGlyphPath" d="M320-273v-414q0-17 12-28.5t28-11.5q5 0 10.5 1.5T381-721l326 207q9 6 13.5 15t4.5 19q0 10-4.5 19T707-446L381-239q-5 3-10.5 4.5T360-233q-16 0-28-11.5T320-273Zm80-73 210-134-210-134v268Z"/></svg>
+            </span>
+            <div class="status-copy">
+              <h2 id="statusTitle">准备签到</h2>
+              <p id="statusMessage" aria-live="polite">使用已保存的 Edge 登录状态</p>
+            </div>
+          </div>
+
+          <div class="progress-block" id="progressBlock" hidden>
+            <div class="progress-meta">
+              <span id="progressLabel">正在准备</span>
+              <span id="progressCount">0 / 0</span>
+            </div>
+            <div class="md-linear-progress" id="progressTrack" data-mode="indeterminate" data-variant="linear" data-wave-amplitude="flat" data-spec="androidx-compose-material3" role="progressbar" aria-label="签到进度" aria-valuemin="0">
+              <div class="progress-linear-layer" aria-hidden="true">
+                <span class="progress-linear-track"></span>
+                <span class="progress-linear-indicator progress-linear-determinate"></span>
+                <span class="progress-linear-indicator progress-linear-first"></span>
+                <span class="progress-linear-indicator progress-linear-second"></span>
+              </div>
+              <svg class="progress-wave-svg" id="progressWaveSvg" viewBox="0 0 360 10" preserveAspectRatio="none" aria-hidden="true">
+                <path class="progress-wave-track" id="progressWaveTrack" d="M2 5H358"/>
+                <path class="progress-wave-path" id="progressBar" d=""/>
+                <circle class="progress-stop" id="progressStop" cx="358" cy="5" r="2"/>
+              </svg>
+            </div>
+            <p class="current-forum" id="currentForum">等待任务开始</p>
+          </div>
+
+          <div class="primary-actions" id="idleActions">
+            <button class="button filled" id="startButton" type="button">
+              <svg class="material-symbol button-icon icon-play" viewBox="0 -960 960 960" aria-hidden="true"><path d="M320-273v-414q0-17 12-28.5t28-11.5q5 0 10.5 1.5T381-721l326 207q9 6 13.5 15t4.5 19q0 10-4.5 19T707-446L381-239q-5 3-10.5 4.5T360-233q-16 0-28-11.5T320-273Z"/></svg>
+              <span id="startButtonText">开始签到</span>
+            </button>
+          </div>
+
+          <div class="primary-actions running-actions" id="runningActions" hidden>
+            <button class="button tonal" id="pauseButton" type="button">
+              <svg class="material-symbol button-icon icon-pause" viewBox="0 -960 960 960" aria-hidden="true"><path d="M640-200q-33 0-56.5-23.5T560-280v-400q0-33 23.5-56.5T640-760q33 0 56.5 23.5T720-680v400q0 33-23.5 56.5T640-200Zm-320 0q-33 0-56.5-23.5T240-280v-400q0-33 23.5-56.5T320-760q33 0 56.5 23.5T400-680v400q0 33-23.5 56.5T320-200Z"/></svg>
+              暂停
+            </button>
+            <button class="button tonal" id="resumeButton" type="button" hidden>
+              <svg class="material-symbol button-icon icon-play" viewBox="0 -960 960 960" aria-hidden="true"><path d="M320-273v-414q0-17 12-28.5t28-11.5q5 0 10.5 1.5T381-721l326 207q9 6 13.5 15t4.5 19q0 10-4.5 19T707-446L381-239q-5 3-10.5 4.5T360-233q-16 0-28-11.5T320-273Z"/></svg>
+              继续
+            </button>
+            <button class="button danger-text" id="stopButton" type="button">
+              <svg class="material-symbol button-icon icon-stop" viewBox="0 -960 960 960" aria-hidden="true"><path d="M240-320v-320q0-33 23.5-56.5T320-720h320q33 0 56.5 23.5T720-640v320q0 33-23.5 56.5T640-240H320q-33 0-56.5-23.5T240-320Z"/></svg>
+              停止
+            </button>
+          </div>
+        </section>
+
+        <section class="summary-band" aria-label="签到统计">
+          <div class="summary-item">
+            <strong id="totalCount">0</strong>
+            <span>总计</span>
+          </div>
+          <div class="summary-item success">
+            <strong id="successCount">0</strong>
+            <span>新签</span>
+          </div>
+          <div class="summary-item signed">
+            <strong id="signedCount">0</strong>
+            <span>已签</span>
+          </div>
+          <div class="summary-item fail">
+            <strong id="failCount">0</strong>
+            <span>失败</span>
+          </div>
+        </section>
+
+        <section class="results-surface" aria-labelledby="resultsTitle">
+          <div class="section-heading">
+            <div>
+              <h2 id="resultsTitle">本次结果</h2>
+              <p id="resultMeta">尚无签到记录</p>
+            </div>
+            <button class="icon-button" id="clearButton" type="button" aria-label="清除记录" title="清除记录" hidden>
+              <svg class="material-symbol" viewBox="0 -960 960 960" aria-hidden="true"><path d="M280-120q-33 0-56.5-23.5T200-200v-520q-17 0-28.5-11.5T160-760q0-17 11.5-28.5T200-800h160q0-17 11.5-28.5T400-840h160q17 0 28.5 11.5T600-800h160q17 0 28.5 11.5T800-760q0 17-11.5 28.5T760-720v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM400-280q17 0 28.5-11.5T440-320v-280q0-17-11.5-28.5T400-640q-17 0-28.5 11.5T360-600v280q0 17 11.5 28.5T400-280Zm160 0q17 0 28.5-11.5T600-320v-280q0-17-11.5-28.5T560-640q-17 0-28.5 11.5T520-600v280q0 17 11.5 28.5T560-280Z"/></svg>
+            </button>
+          </div>
+          <div class="result-list" id="resultList" role="list">
+            <div class="empty-state" id="emptyState">
+              <span class="empty-icon" aria-hidden="true"><svg class="material-symbol" viewBox="0 -960 960 960"><path d="m424-408-86-86q-11-11-28-11t-28 11q-11 11-11 28t11 28l114 114q12 12 28 12t28-12l226-226q11-11 11-28t-11-28q-11-11-28-11t-28 11L424-408Zm56 328q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z"/></svg></span>
+              <p>暂无签到记录</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="footer-actions" id="footerActions" hidden>
+          <button class="button outlined" id="retryButton" type="button">
+            <svg class="material-symbol button-icon" viewBox="0 -960 960 960" aria-hidden="true"><path d="M393-132q-103-29-168-113.5T160-440q0-57 19-108.5t54-94.5q11-12 27-12.5t29 12.5q11 11 11.5 27T290-586q-24 31-37 68t-13 78q0 81 47.5 144.5T410-209q13 4 21.5 15t8.5 24q0 20-14 31.5t-33 6.5Zm174 0q-19 5-33-7t-14-32q0-12 8.5-23t21.5-15q75-24 122.5-87T720-440q0-100-70-170t-170-70h-3l16 16q11 11 11 28t-11 28q-11 11-28 11t-28-11l-84-84q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l84-84q11-11 28-11t28 11q11 11 11 28t-11 28l-16 16h3q134 0 227 93t93 227q0 109-65 194T567-132Z"/></svg>
+            <span id="retryButtonText">重试失败项</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="view settings-view" id="settingsView" aria-labelledby="settingsTitle" hidden>
+        <div class="settings-app-bar">
+          <button class="icon-button" id="backButton" type="button" aria-label="返回" title="返回">
+            <svg class="material-symbol" viewBox="0 -960 960 960" aria-hidden="true"><path d="m313-440 196 196q12 12 11.5 28T508-188q-12 11-28 11.5T452-188L188-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l264-264q11-11 27.5-11t28.5 11q12 12 12 28.5T508-715L313-520h447q17 0 28.5 11.5T800-480q0 17-11.5 28.5T760-440H313Z"/></svg>
+          </button>
+          <h2 id="settingsTitle">设置</h2>
+        </div>
+
+        <form id="settingsForm" novalidate>
+          <div class="settings-scroll">
+          <section class="settings-section credential-section" aria-labelledby="credentialTitle">
+            <div class="settings-section-heading">
+              <h3 id="credentialTitle">百度登录凭据</h3>
+              <span class="state-chip" id="authStatus" data-state="missing">未保存</span>
+            </div>
+            <label class="credential-field" for="savedCookieInput">
+              <span>已保存 Cookie</span>
+              <span class="input-with-action">
+                <input id="savedCookieInput" type="password" readonly spellcheck="false" autocomplete="off" value="">
+                <button class="field-icon-button" id="cookieVisibilityButton" type="button" aria-label="显示 Cookie" title="显示 Cookie" aria-pressed="false">
+                  <svg class="material-symbol eye-open" viewBox="0 -960 960 960" aria-hidden="true"><path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-134 0-244.5-72T61-462q-5-9-7.5-18.5T51-500q0-10 2.5-19.5T61-538q64-118 174.5-190T480-800q134 0 244.5 72T899-538q5 9 7.5 18.5T909-500q0 10-2.5 19.5T899-462q-64 118-174.5 190T480-200Zm0-80q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"/></svg>
+                  <svg class="material-symbol eye-closed" viewBox="0 -960 960 960" aria-hidden="true"><path d="M607-627q29 29 42.5 66t9.5 76q0 15-11 25.5T622-449q-15 0-25.5-10.5T586-485q5-26-3-50t-25-41q-17-17-41-26t-51-4q-15 0-25.5-11T430-643q0-15 10.5-25.5T466-679q38-4 75 9.5t66 42.5Zm-127-93q-19 0-37 1.5t-36 5.5q-17 3-30.5-5T358-742q-5-16 3.5-31t24.5-18q23-5 46.5-7t47.5-2q137 0 250.5 72T904-534q4 8 6 16.5t2 17.5q0 9-1.5 17.5T905-466q-18 40-44.5 75T802-327q-12 11-28 9t-26-16q-10-14-8.5-30.5T753-392q24-23 44-50t35-58q-50-101-144.5-160.5T480-720Zm0 520q-134 0-245-72.5T60-463q-5-8-7.5-17.5T50-500q0-10 2-19t7-18q20-40 46.5-76.5T166-680l-83-84q-11-12-10.5-28.5T84-820q11-11 28-11t28 11l680 680q11 11 11.5 27.5T820-84q-11 11-28 11t-28-11L624-222q-35 11-71 16.5t-73 5.5ZM222-624q-29 26-53 57t-41 67q50 101 144.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Z"/></svg>
+                </button>
+              </span>
+            </label>
+            <p class="credential-meta" id="cookieMeta">尚未捕获登录 Cookie</p>
+            <div class="credential-actions">
+              <button class="button tonal compact" id="refreshCookieButton" type="button">
+                <svg class="material-symbol button-icon" viewBox="0 -960 960 960" aria-hidden="true"><path d="M240-478q0 45 17 87.5t53 78.5l10 10v-58q0-17 11.5-28.5T360-400q17 0 28.5 11.5T400-360v160q0 17-11.5 28.5T360-160H200q-17 0-28.5-11.5T160-200q0-17 11.5-28.5T200-240h70l-16-14q-52-46-73-105t-21-119q0-94 48-170.5T337-766q14-8 29.5-1t20.5 23q5 15-.5 30T367-691q-58 32-92.5 88.5T240-478Zm480-4q0-45-17-87.5T650-648l-10-10v58q0 17-11.5 28.5T600-560q-17 0-28.5-11.5T560-600v-160q0-17 11.5-28.5T600-800h160q17 0 28.5 11.5T800-760q0 17-11.5 28.5T760-720h-70l16 14q49 49 71.5 106.5T800-482q0 94-48 170.5T623-194q-14 8-29.5 1T573-216q-5-15 .5-30t19.5-23q58-32 92.5-88.5T720-482Z"/></svg>
+                同步
+              </button>
+              <button class="button text compact" id="openAuthButton" type="button">重新登录</button>
+              <button class="button danger-text compact" id="clearCookieButton" type="button">清除副本</button>
+            </div>
+          </section>
+
+          <section class="settings-section" aria-labelledby="signModeTitle">
+            <h3 class="settings-group-title" id="signModeTitle">签到模式</h3>
+            <div class="segmented-control" role="radiogroup" aria-labelledby="signModeTitle">
+              <label>
+                <input type="radio" name="signMode" value="fast" checked>
+                <span>快速签到</span>
+              </label>
+              <label>
+                <input type="radio" name="signMode" value="safe">
+                <span>检查后签到</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="settings-section" aria-labelledby="scanSettingsTitle">
+            <h3 class="settings-group-title" id="scanSettingsTitle">扫描设置</h3>
+            <div class="settings-grid">
+              <label class="field">
+                <span>扫描页数</span>
+                <input id="maxPagesInput" type="number" min="1" max="100" step="1" inputmode="numeric" required>
+              </label>
+              <label class="field">
+                <span>tbs 刷新</span>
+                <input id="maxRefreshesInput" type="number" min="0" max="3" step="1" inputmode="numeric" required>
+              </label>
+            </div>
+          </section>
+
+          <section class="settings-section" aria-labelledby="requestIntervalTitle">
+            <h3 class="settings-group-title" id="requestIntervalTitle">请求间隔</h3>
+            <div class="settings-grid">
+              <label class="field">
+                <span>最短（毫秒）</span>
+                <input id="minDelayInput" type="number" min="0" max="60000" step="100" inputmode="numeric" required>
+              </label>
+              <label class="field">
+                <span>最长（毫秒）</span>
+                <input id="maxDelayInput" type="number" min="0" max="60000" step="100" inputmode="numeric" required>
+              </label>
+            </div>
+          </section>
+
+          <section class="settings-section automation-settings" aria-labelledby="automationTitle">
+            <h3 class="settings-group-title" id="automationTitle">自动化</h3>
+            <label class="toggle-row">
+              <span><strong>每日自动签到</strong></span>
+              <input id="autoSignInput" type="checkbox" role="switch">
+            </label>
+            <label class="time-row" id="autoTimeRow">
+              <span class="time-label"><svg class="material-symbol" viewBox="0 -960 960 960" aria-hidden="true"><path d="M520-496v-144q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640v159q0 8 3 15.5t9 13.5l132 132q11 11 28 11t28-11q11-11 11-28t-11-28L520-496ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Z"/></svg><span>执行时间</span></span>
+              <input id="autoTimeInput" type="time" value="09:00" required>
+            </label>
+            <label class="toggle-row">
+              <span><strong>完成后通知</strong></span>
+              <input id="notificationsInput" type="checkbox" role="switch">
+            </label>
+          </section>
+
+          <details class="advanced-settings">
+            <summary>高级设置<svg class="material-symbol summary-expand" viewBox="0 -960 960 960" aria-hidden="true"><path d="M480-362q-8 0-15-2.5t-13-8.5L268-557q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-373q-6 6-13 8.5t-15 2.5Z"/></svg></summary>
+            <div class="advanced-body">
+              <div class="settings-grid">
+                <label class="field">
+                  <span>请求超时（秒）</span>
+                  <input id="requestTimeoutInput" type="number" min="5" max="120" step="1" inputmode="numeric" required>
+                </label>
+                <label class="field">
+                  <span>网络重试</span>
+                  <input id="networkRetriesInput" type="number" min="0" max="4" step="1" inputmode="numeric" required>
+                </label>
+                <label class="field">
+                  <span>限流重试</span>
+                  <input id="rateLimitRetriesInput" type="number" min="0" max="3" step="1" inputmode="numeric" required>
+                </label>
+                <label class="field">
+                  <span>退避基数（毫秒）</span>
+                  <input id="retryBaseDelayInput" type="number" min="250" max="30000" step="250" inputmode="numeric" required>
+                </label>
+              </div>
+            </div>
+          </details>
+
+            <p class="form-error" id="formError" role="alert" hidden></p>
+          </div>
+
+          <div class="settings-actions">
+            <button class="button text" id="cancelSettingsButton" type="button">取消</button>
+            <button class="button filled" id="saveSettingsButton" type="submit"><svg class="material-symbol button-icon" viewBox="0 -960 960 960" aria-hidden="true"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h447q16 0 30.5 6t25.5 17l114 114q11 11 17 25.5t6 30.5v447q0 33-23.5 56.5T760-120H200Zm560-526L646-760H200v560h560v-446ZM480-240q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35ZM280-560h280q17 0 28.5-11.5T600-600v-80q0-17-11.5-28.5T560-720H280q-17 0-28.5 11.5T240-680v80q0 17 11.5 28.5T280-560Z"/></svg><span>保存</span></button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  </div>
+
+  <script src="shared.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

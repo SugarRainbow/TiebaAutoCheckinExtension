@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="贴吧签到">
+  <rect width="128" height="128" rx="24" fill="#65558f"/>
+  <path d="M34 39h60M34 61h38" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
+  <path d="m48 88 13 13 31-34" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

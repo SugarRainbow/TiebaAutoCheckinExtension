@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "贴吧签到",
+  "version": "3.1.1",
+  "description": "使用当前 Edge 贴吧登录态，通过 Material 3 界面一键完成关注贴吧签到。",
+  "action": {
+    "default_title": "贴吧签到",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "alarms",
+    "cookies",
+    "notifications",
+    "offscreen",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://*.baidu.com/*"
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
