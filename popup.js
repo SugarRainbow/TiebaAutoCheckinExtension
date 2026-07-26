@@ -61,7 +61,6 @@
     strokeWidth: 4,
     amplitude: 3,
     wavelength: 40,
-    minimumVisibleLength: 40,
     gapSize: 4,
     stopSize: 4,
     waveSpeed: 40
@@ -180,13 +179,18 @@
   let waveAnimationFrame = 0;
   let waveLastFrameTime = 0;
   let wavePhase = 0;
-  let waveProgressRatio = 0;
+  let waveRatioTarget = 0;
+  let waveRatioRendered = 0;
+  let waveRatioFrom = 0;
+  let waveRatioEaseStart = 0;
+  // Matches the --progress-ratio transition in popup.css so the wavy and
+  // linear variants move with one motion.
+  const PROGRESS_EASE_DURATION = 250;
 
   Object.assign(els.progressTrack.dataset, {
     waveStroke: String(WAVY_PROGRESS_TOKENS.strokeWidth),
     wavePeak: String(WAVY_PROGRESS_TOKENS.amplitude),
     waveWavelength: String(WAVY_PROGRESS_TOKENS.wavelength),
-    waveMinimum: String(WAVY_PROGRESS_TOKENS.minimumVisibleLength),
     waveGap: String(WAVY_PROGRESS_TOKENS.gapSize),
     waveStop: String(WAVY_PROGRESS_TOKENS.stopSize),
     waveSpeed: String(WAVY_PROGRESS_TOKENS.waveSpeed)
@@ -222,6 +226,45 @@
 
   function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
+  }
+
+  // cubic-bezier(0.2, 0, 0, 1): x(t) = 0.6t(1-t)^2 + t^3, y(t) = t^2(3 - 2t).
+  function progressEase(fraction) {
+    if (fraction <= 0) return 0;
+    if (fraction >= 1) return 1;
+    let t = fraction;
+    for (let i = 0; i < 6; i += 1) {
+      const x = 0.6 * t * (1 - t) * (1 - t) + t * t * t - fraction;
+      const slope = 0.6 * (1 - t) * (1 - 3 * t) + 3 * t * t;
+      if (!slope) break;
+      t -= x / slope;
+    }
+    t = clamp(t, 0, 1);
+    return t * t * (3 - 2 * t);
+  }
+
+  function setWaveRatioTarget(ratio) {
+    const target = clamp(ratio, 0, 1);
+    if (target === waveRatioTarget) return;
+    waveRatioTarget = target;
+    if (reducedMotionQuery.matches) {
+      waveRatioRendered = target;
+      waveRatioEaseStart = 0;
+      return;
+    }
+    waveRatioFrom = waveRatioRendered;
+    waveRatioEaseStart = performance.now();
+  }
+
+  function stepWaveRatio(now) {
+    if (!waveRatioEaseStart) return;
+    const fraction = (now - waveRatioEaseStart) / PROGRESS_EASE_DURATION;
+    if (fraction >= 1) {
+      waveRatioRendered = waveRatioTarget;
+      waveRatioEaseStart = 0;
+      return;
+    }
+    waveRatioRendered = waveRatioFrom + (waveRatioTarget - waveRatioFrom) * progressEase(fraction);
   }
 
   function buildWavePath(startX, endX, phase) {
@@ -269,20 +312,15 @@
     const {
       containerHeight,
       gapSize,
-      minimumVisibleLength,
       stopSize,
       strokeWidth
     } = WAVY_PROGRESS_TOKENS;
     const centerY = containerHeight / 2;
     const strokeInset = strokeWidth / 2;
-    const ratio = clamp(waveProgressRatio, 0, 1);
+    const ratio = clamp(waveRatioRendered, 0, 1);
     const semanticHead = width * ratio;
-    const minimumHead = Math.min(width - strokeInset, strokeInset + minimumVisibleLength);
-    const visualHead = els.progressTrack.dataset.variant === 'wavy' && ratio < 1
-      ? Math.max(semanticHead, minimumHead)
-      : semanticHead;
-    const activeVisible = visualHead >= strokeInset;
-    const activeHead = clamp(visualHead, strokeInset, width - strokeInset);
+    const activeVisible = semanticHead >= strokeInset;
+    const activeHead = clamp(semanticHead, strokeInset, width - strokeInset);
     const wavePath = activeVisible
       ? buildWavePath(strokeInset, activeHead, wavePhase)
       : '';
@@ -331,6 +369,7 @@
         % WAVY_PROGRESS_TOKENS.wavelength;
     }
     waveLastFrameTime = timestamp;
+    stepWaveRatio(timestamp);
     renderWavyGeometry();
     waveAnimationFrame = globalThis.requestAnimationFrame?.(animateWave) || 0;
   }
@@ -345,7 +384,11 @@
       waveAnimationFrame = globalThis.requestAnimationFrame?.(animateWave) || 0;
     } else if (!shouldAnimate) {
       stopWaveAnimation();
-      if (reducedMotionQuery.matches) wavePhase = 0;
+      if (reducedMotionQuery.matches) {
+        wavePhase = 0;
+        waveRatioRendered = waveRatioTarget;
+        waveRatioEaseStart = 0;
+      }
       renderWavyGeometry();
     }
   }
@@ -561,7 +604,7 @@
       : 'flat';
     els.progressTrack.style.setProperty('--progress-ratio', String(progressRatio));
     els.progressTrack.dataset.progress = percentage.toFixed(2);
-    waveProgressRatio = progressRatio;
+    setWaveRatioTarget(progressRatio);
 
     if (running) {
       els.progressLabel.textContent = waitingForLogin

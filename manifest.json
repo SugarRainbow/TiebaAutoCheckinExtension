@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "贴吧签到",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "使用当前 Edge 贴吧登录态，通过 Material 3 界面一键完成关注贴吧签到。",
   "action": {
     "default_title": "贴吧签到",

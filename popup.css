@@ -430,6 +430,14 @@ summary:focus-visible {
   font-variant-numeric: tabular-nums;
 }
 
+/* Registered so the ratio itself transitions; the determinate linear bar and
+   the wavy SVG head both follow it and stay in sync. */
+@property --progress-ratio {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
 .md-linear-progress {
   --progress-ratio: 0;
   --wavy-container-height: 10px;
@@ -444,6 +452,7 @@ summary:focus-visible {
   margin-top: var(--md-sys-spacing-100);
   overflow: hidden;
   border-radius: var(--md-sys-shape-corner-full);
+  transition: --progress-ratio 250ms cubic-bezier(0.2, 0, 0, 1);
 }
 
 .progress-linear-layer,
@@ -481,7 +490,6 @@ summary:focus-visible {
   inset-inline: 0;
   transform: scaleX(var(--progress-ratio));
   transform-origin: left center;
-  transition: transform 250ms cubic-bezier(0.2, 0, 0, 1);
 }
 
 .progress-linear-first,
